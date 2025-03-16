@@ -1,3 +1,7 @@
+## Warning
+
+This project is a **fork** of [ewewukek's Flight Mod](https://github.com/ewewukek/fabric-flightmod), specifically designed for **Minecraft version 1.19.3**. This fork adds additional options to control flight permission in the game. I do not claim any attribution for the original code.
+
 ## Flight Mod
 
 Hunger-based flight for survival. With client-side flying mechanics tweaks. [Download from CurseForge](https://www.curseforge.com/minecraft/mc-mods/flight-mod-fabric/files/all)

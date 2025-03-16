@@ -15,5 +15,6 @@ public class FlightMod implements ModInitializer {
     public void onInitialize() {
         Config.setServer(null);
         Config.load();
+        FlyCommand.register();
     }
 }

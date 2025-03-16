@@ -108,9 +108,7 @@ public class ModMenuConfigScreen implements ModMenuApi {
                 .setSaveConsumer(value -> Config.sneakJumpDrop = value)
                 .build());
 
-            builder.setSavingRunnable(() -> {
-                Config.save();
-            });
+            builder.setSavingRunnable(Config::save);
 
             return builder.build();
         };

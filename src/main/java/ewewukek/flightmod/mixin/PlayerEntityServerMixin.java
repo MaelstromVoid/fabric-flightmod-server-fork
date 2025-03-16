@@ -26,11 +26,13 @@ public class PlayerEntityServerMixin {
         if (player.world.isClient || abilities.invulnerable) return;
 
         if (!Config.enableFlying) {
-            if (abilities.allowFlying || abilities.flying) {
-                abilities.allowFlying = abilities.flying = false;
-                player.sendAbilitiesUpdate();
+            if (!Config.IsAllowedToFly(player.getName().getString())) {
+                if (abilities.allowFlying || abilities.flying) {
+                    abilities.allowFlying = abilities.flying = false;
+                    player.sendAbilitiesUpdate();
+                }
+                return;
             }
-            return;
         }
 
         boolean prevAllowFlying = abilities.allowFlying;

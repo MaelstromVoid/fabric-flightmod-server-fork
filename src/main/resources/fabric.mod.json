@@ -18,7 +18,7 @@
       "ewewukek.flightmod.ModMenuConfigScreen"
     ]
   },
-  "accessWidener": "flightmod.aw",
+  "accessWidener": "flightmod.accesswidener",
   "mixins": [
     "flightmod.mixins.json"
   ],
