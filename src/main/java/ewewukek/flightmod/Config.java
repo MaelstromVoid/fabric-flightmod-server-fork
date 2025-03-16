@@ -6,8 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.util.Locale;
-import java.util.Scanner;
+import java.util.*;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -46,6 +45,9 @@ public class Config {
 
     public static int foodLevelWarning;
     public static final int FOOD_LEVEL_WARNING_DEFAULT = 6;
+
+    public final static Map<String, Boolean> playersAllowedToFlyHashMap = new HashMap<>();
+    public final static List<String> playersAllowedToFly = new ArrayList<>();
 
     public static MovementMode movementMode;
     public static final MovementMode MOVEMENT_MODE_DEFAULT_SINGLEPLAYER = MovementMode.FULL_SPEED;
@@ -134,50 +136,61 @@ public class Config {
                     String value = s.next().trim();
 
                     switch (key) {
-                    case "enableFlying":
-                        enableFlying = Boolean.parseBoolean(value);
-                        break;
-                    case "doFallDamage":
-                        doFallDamage = Boolean.parseBoolean(value);
-                        break;
-                    case "flyInWater":
-                        flyInWater = Boolean.parseBoolean(value);
-                        break;
-                    case "flyInLava":
-                        flyInLava = Boolean.parseBoolean(value);
-                        break;
-                    case "flyInSlowBlocks":
-                        flyInSlowBlocks = Boolean.parseBoolean(value);
-                        break;
-                    case "flyingCost":
-                        flyingCost = Float.parseFloat(value);
-                        break;
-                    case "flyingHorizontalCost":
-                        flyingHorizontalCost = Float.parseFloat(value);
-                        break;
-                    case "flyingUpCost":
-                        flyingUpCost = Float.parseFloat(value);
-                        break;
-                    case "foodLevelWarning":
-                        foodLevelWarning = Integer.parseInt(value);
-                        break;
-                    case "movementMode":
-                        movementMode = MovementMode.read(value);
-                        break;
-                    case "inertiaCompensationMode": // remnants of previous version
-                        compensateSideInertia = value != "never";
-                        break;
-                    case "compensateSideInertia":
-                        compensateSideInertia = Boolean.parseBoolean(value);
-                        break;
-                    case "airJumpFly":
-                        airJumpFly = Boolean.parseBoolean(value);
-                        break;
-                    case "sneakJumpDrop":
-                        sneakJumpDrop = Boolean.parseBoolean(value);
-                        break;
-                    default:
-                        throw new IOException("unrecognized field: " + key);
+                        case "enableFlying":
+                            enableFlying = Boolean.parseBoolean(value);
+                            break;
+                        case "doFallDamage":
+                            doFallDamage = Boolean.parseBoolean(value);
+                            break;
+                        case "flyInWater":
+                            flyInWater = Boolean.parseBoolean(value);
+                            break;
+                        case "flyInLava":
+                            flyInLava = Boolean.parseBoolean(value);
+                            break;
+                        case "flyInSlowBlocks":
+                            flyInSlowBlocks = Boolean.parseBoolean(value);
+                            break;
+                        case "flyingCost":
+                            flyingCost = Float.parseFloat(value);
+                            break;
+                        case "flyingHorizontalCost":
+                            flyingHorizontalCost = Float.parseFloat(value);
+                            break;
+                        case "flyingUpCost":
+                            flyingUpCost = Float.parseFloat(value);
+                            break;
+                        case "foodLevelWarning":
+                            foodLevelWarning = Integer.parseInt(value);
+                            break;
+                        case "movementMode":
+                            movementMode = MovementMode.read(value);
+                            break;
+                        case "inertiaCompensationMode": // remnants of previous version
+                            compensateSideInertia = value != "never";
+                            break;
+                        case "compensateSideInertia":
+                            compensateSideInertia = Boolean.parseBoolean(value);
+                            break;
+                        case "airJumpFly":
+                            airJumpFly = Boolean.parseBoolean(value);
+                            break;
+                        case "sneakJumpDrop":
+                            sneakJumpDrop = Boolean.parseBoolean(value);
+                            break;
+                        case "playerAllowedToFlight":
+                            playersAllowedToFly.clear();
+                            if (!value.isEmpty()) {
+                                String[] names = value.split("\\s*,\\s*");
+                                for (String name : names) {
+                                    if (!name.isEmpty()) {
+                                        playersAllowedToFly.add(name);
+                                    }
+                                }
+                            }
+                            break;
+                        default:
+                            throw new IOException("unrecognized field: " + key);
                     }
                 }
             }
@@ -208,8 +221,21 @@ public class Config {
             writer.write("airJumpFly = " + airJumpFly + "\n");
             writer.write("sneakJumpDrop = " + sneakJumpDrop + "\n");
 
+            String players = String.join(",", playersAllowedToFly);
+            writer.write("playerAllowedToFlight = " + players + "\n");
+
         } catch (IOException e) {
             logger.warn("Could not save configuration file: ", e);
+        }
+    }
+
+    public static Boolean IsAllowedToFly(String playerName){
+        if (playersAllowedToFlyHashMap.containsKey(playerName)) {
+            return playersAllowedToFlyHashMap.get(playerName);
+        } else {
+            Boolean newValue = playersAllowedToFly.contains(playerName);
+            playersAllowedToFlyHashMap.put(playerName, newValue);
+            return newValue;
         }
     }
 
@@ -233,12 +259,12 @@ public class Config {
 
         public MovementMode next() {
             switch (this) {
-            case VANILLA:
-                return VANILLA_VERTICAL;
-            case VANILLA_VERTICAL:
-                return FULL_SPEED;
-            case FULL_SPEED:
-                return VANILLA;
+                case VANILLA:
+                    return VANILLA_VERTICAL;
+                case VANILLA_VERTICAL:
+                    return FULL_SPEED;
+                case FULL_SPEED:
+                    return VANILLA;
             }
             throw new RuntimeException("invalid mode");
         }
